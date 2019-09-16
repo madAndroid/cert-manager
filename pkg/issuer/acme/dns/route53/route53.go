@@ -66,7 +66,7 @@ func (d customRetryer) RetryRules(r *request.Request) time.Duration {
 // NewDNSProvider returns a DNSProvider instance configured for the AWS
 // Route 53 service using static credentials from its parameters or, if they're
 // unset and the 'ambient' option is set, credentials from the environment.
-func NewDNSProvider(accessKeyID, secretAccessKey, hostedZoneID, region string, ambient bool, dns01Nameservers []string) (*DNSProvider, error) {
+func NewDNSProvider(accessKeyID, secretAccessKey, hostedZoneID, region string, endpoint string, ambient bool, dns01Nameservers []string) (*DNSProvider, error) {
 	if accessKeyID == "" && secretAccessKey == "" {
 		if !ambient {
 			return nil, fmt.Errorf("unable to construct route53 provider: empty credentials; perhaps you meant to enable ambient credentials?")
@@ -105,7 +105,15 @@ func NewDNSProvider(accessKeyID, secretAccessKey, hostedZoneID, region string, a
 		return nil, fmt.Errorf("unable to create aws session: %s", err)
 	}
 	sess.Handlers.Build.PushBack(request.WithAppendUserAgent(pkgutil.CertManagerUserAgent))
-	client := route53.New(sess, config)
+
+	/*if endpoint != "" {
+		log.Infof("Using endpoint: %s", endpoint)
+		endpoint = aws.NewConfig().WithEndpoint(endpoint)
+	} else {
+		endpoint = aws.NewConfig()
+	}*/
+
+	client := route53.New(sess, aws.NewConfig().WithEndpoint(endpoint))
 
 	return &DNSProvider{
 		client:           client,
