@@ -497,6 +497,10 @@ type ACMEIssuerDNS01ProviderRoute53 struct {
 	// +optional
 	HostedZoneID string `json:"hostedZoneID,omitempty"`
 
+	// If set, the provider will use this endpoint instead of the standard route53 endpoint; useful in environments like China, where R53 is in beta
+	// +optional
+	Endpoint string `json:"endpoint,omitempty"`
+
 	// Always set the region when using AccessKeyID and SecretAccessKey
 	Region string `json:"region"`
 }

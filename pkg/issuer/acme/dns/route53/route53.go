@@ -69,6 +69,7 @@ type sessionProvider struct {
 	SecretAccessKey string
 	Ambient         bool
 	Region          string
+	Endpoint        string
 	Role            string
 	StsProvider     func(*session.Session) stsiface.STSAPI
 }
@@ -162,14 +163,21 @@ func defaultSTSProvider(sess *session.Session) stsiface.STSAPI {
 // NewDNSProvider returns a DNSProvider instance configured for the AWS
 // Route 53 service using static credentials from its parameters or, if they're
 // unset and the 'ambient' option is set, credentials from the environment.
-func NewDNSProvider(accessKeyID, secretAccessKey, hostedZoneID, region, role string, ambient bool, dns01Nameservers []string) (*DNSProvider, error) {
+func NewDNSProvider(accessKeyID, secretAccessKey, hostedZoneID, endpoint, region, role string, ambient bool, dns01Nameservers []string) (*DNSProvider, error) {
 	provider, err := newSessionProvider(accessKeyID, secretAccessKey, region, role, ambient)
 	sess, err := provider.GetSession()
 	if err != nil {
 		return nil, err
 	}
 
-	client := route53.New(sess)
+	/*if endpoint != "" {
+					log.Infof("Using endpoint: %s", endpoint)
+					endpoint = aws.NewConfig().WithEndpoint(endpoint)
+	} else {
+					endpoint = aws.NewConfig()
+	}*/
+
+	client := route53.New(sess, aws.NewConfig().WithEndpoint(endpoint))
 
 	return &DNSProvider{
 		client:           client,
