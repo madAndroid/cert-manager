@@ -100,20 +100,19 @@ func NewDNSProvider(accessKeyID, secretAccessKey, hostedZoneID, region string, e
 	if region != "" || !useAmbientCredentials {
 		config.WithRegion(region)
 	}
+
+	if endpoint != "" {
+		config.WithEndpoint(endpoint)
+		klog.V(5).Infof("Using alternate endpoint")
+	}
+
 	sess, err := session.NewSessionWithOptions(sessionOpts)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create aws session: %s", err)
 	}
 	sess.Handlers.Build.PushBack(request.WithAppendUserAgent(pkgutil.CertManagerUserAgent))
 
-	/*if endpoint != "" {
-		log.Infof("Using endpoint: %s", endpoint)
-		endpoint = aws.NewConfig().WithEndpoint(endpoint)
-	} else {
-		endpoint = aws.NewConfig()
-	}*/
-
-	client := route53.New(sess, aws.NewConfig().WithEndpoint(endpoint))
+	client := route53.New(sess)
 
 	return &DNSProvider{
 		client:           client,
