@@ -114,7 +114,7 @@ func NewDNSProvider(accessKeyID, secretAccessKey, hostedZoneID, region string, e
 	}
 	sess.Handlers.Build.PushBack(request.WithAppendUserAgent(pkgutil.CertManagerUserAgent))
 
-	client := route53.New(sess)
+	client := route53.New(sess, aws.NewConfig().WithEndpoint(endpoint))
 
 	// klog.V(5).Infof(client)
 
