@@ -103,8 +103,7 @@ func NewDNSProvider(accessKeyID, secretAccessKey, hostedZoneID, region string, e
 
 	if endpoint != "" {
 		config.WithEndpoint(endpoint)
-		sessionOpts.Config = aws.Config{Region: aws.String(region)}
-		sessionOpts.SharedConfigState = session.SharedConfigEnable
+		// sessionOpts.Config = aws.Config{Region: aws.String(region)}
 		klog.V(5).Infof("Using alternate endpoint:")
 		klog.V(5).Infof(endpoint)
 	}
