@@ -98,14 +98,17 @@ func NewDNSProvider(accessKeyID, secretAccessKey, hostedZoneID, region string, e
 	// If ambient credentials aren't permitted, always set the region, even if to
 	// empty string, to avoid it falling back on the environment.
 	if region != "" || !useAmbientCredentials {
+		klog.V(5).Infof("Using region:")
+		klog.V(5).Infof(region)
 		config.WithRegion(region)
 	}
 
 	if endpoint != "" {
-		config.WithEndpoint(endpoint)
-		// sessionOpts.Config = aws.Config{Region: aws.String(region)}
 		klog.V(5).Infof("Using alternate endpoint:")
 		klog.V(5).Infof(endpoint)
+		config.WithEndpoint(endpoint)
+		sessionOpts.SharedConfigState = session.SharedConfigEnable
+		sessionOpts.Config = aws.Config{Region: aws.String(region)}
 	}
 
 	sess, err := session.NewSessionWithOptions(sessionOpts)
@@ -114,7 +117,7 @@ func NewDNSProvider(accessKeyID, secretAccessKey, hostedZoneID, region string, e
 	}
 	sess.Handlers.Build.PushBack(request.WithAppendUserAgent(pkgutil.CertManagerUserAgent))
 
-	client := route53.New(sess, aws.NewConfig().WithEndpoint(endpoint))
+	client := route53.New(sess)
 
 	// klog.V(5).Infof(client)
 
