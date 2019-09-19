@@ -103,7 +103,10 @@ func NewDNSProvider(accessKeyID, secretAccessKey, hostedZoneID, region string, e
 
 	if endpoint != "" {
 		config.WithEndpoint(endpoint)
-		klog.V(5).Infof("Using alternate endpoint")
+		sessionOpts.Config = aws.Config{Region: aws.String(region)}
+		sessionOpts.SharedConfigState = session.SharedConfigEnable
+		klog.V(5).Infof("Using alternate endpoint:")
+		klog.V(5).Infof(endpoint)
 	}
 
 	sess, err := session.NewSessionWithOptions(sessionOpts)
@@ -113,6 +116,8 @@ func NewDNSProvider(accessKeyID, secretAccessKey, hostedZoneID, region string, e
 	sess.Handlers.Build.PushBack(request.WithAppendUserAgent(pkgutil.CertManagerUserAgent))
 
 	client := route53.New(sess)
+
+	// klog.V(5).Infof(client)
 
 	return &DNSProvider{
 		client:           client,
