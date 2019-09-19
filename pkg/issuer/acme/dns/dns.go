@@ -325,8 +325,8 @@ func (s *Solver) solverForChallenge(ctx context.Context, issuer v1alpha1.Generic
 			strings.TrimSpace(providerConfig.Route53.AccessKeyID),
 			strings.TrimSpace(secretAccessKey),
 			providerConfig.Route53.HostedZoneID,
-			providerConfig.Route53.Endpoint,
 			providerConfig.Route53.Region,
+			providerConfig.Route53.Endpoint,
 			canUseAmbientCredentials,
 			s.DNS01Nameservers,
 		)
